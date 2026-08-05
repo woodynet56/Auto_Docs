@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "id": "gestoria-reaver-delete-after-30-days",
+      "enabled": true,
+      "conditions": {
+        "prefix": "requests/"
+      },
+      "deleteObjectsTransition": {
+        "condition": {
+          "type": "Age",
+          "maxAge": 2592000
+        }
+      }
+    }
+  ]
+}
