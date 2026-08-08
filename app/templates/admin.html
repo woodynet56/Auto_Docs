@@ -1,6 +1,0 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Operación | Gestoría Reaver</title><link rel="stylesheet" href="/static/css/site.css"></head><body>
-<main class="admin-shell" data-csrf="{{ identity.csrf }}">
-  <header class="admin-head"><div><p class="eyebrow">Centro operativo</p><h1>Gestoría Reaver</h1><p>{{ identity.email }}</p></div><form method="post" action="/admin/logout"><button class="button secondary">Cerrar sesión</button></form></header>
-  <section id="summary" class="metric-grid" aria-live="polite">Cargando indicadores…</section>
-  <section class="admin-card"><div class="section-title"><div><p class="eyebrow">Seguridad documental</p><h2>Cola de cuarentena</h2></div><button id="refresh" class="button secondary">Actualizar</button></div><div class="table-wrap"><table><thead><tr><th>Estado</th><th>Tipo</th><th>Tamaño</th><th>Intentos</th><th>Creado</th><th>Acción</th></tr></thead><tbody id="queue"></tbody></table></div></section>
-</main><script src="/static/js/admin.js" defer></script></body></html>
