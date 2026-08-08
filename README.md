@@ -1,6 +1,6 @@
-# Gestoría Reaver 0.12.0
+# Gestoría Reaver 0.12.2
 
-Versión actual: **0.12.0**. La base funcional incorpora SSO OIDC, RBAC, cuarentena y portal
+Versión actual: **0.12.2**. La base funcional incorpora SSO OIDC, RBAC, cuarentena y portal
 reforzado. Esta fase añade certificación reproducible de preproducción, carga, DAST y respaldo
 cifrado con restauración ensayable. El paquete está técnicamente preparado, pero su liberación
 permanece condicionada a obtener la evidencia externa detallada en
@@ -15,6 +15,19 @@ y el panel aún no están implementados.
 
 Aplicar el esquema con `alembic upgrade head`. Render ejecuta esta migración como paso previo
 controlado antes de iniciar una nueva versión.
+
+## Quality Gate obligatorio
+
+Después de cada cambio instala las dependencias de desarrollo y ejecuta:
+
+```bash
+python scripts/quality_gate.py --profile local
+```
+
+Los criterios Gherkin ejecutables están en `tests/acceptance/features/` y el procedimiento
+completo, incluida la decisión `GO/NO-GO`, está en `docs/qa/PROCEDIMIENTO_QA.md`. Producción
+requiere además que el workflow CI apruebe con PostgreSQL 17 y que la certificación de
+preproducción esté completa.
 
 ## Requisitos
 
@@ -73,9 +86,27 @@ La prueba de humo espera `root=200`, `live=200` y, si PostgreSQL local no está 
 
 ## Despliegue
 
-El archivo `render.yaml` crea un servicio web y PostgreSQL. Antes de desplegar, revise región y
-planes, conecte el repositorio de GitHub y confirme que las comprobaciones de CI estén aprobadas.
-Los secretos de WhatsApp y Cloudflare R2 se configuran exclusivamente como variables protegidas.
+El archivo `render.yaml` crea el servicio web, PostgreSQL y los dos procesos programados. El
+Blueprint ya contiene el dominio de preproducción `https://auto-docs-kv9o.onrender.com`, el CTA
+público de WhatsApp `525565808766` y el número empresarial `+525565808766`. Si Render asigna otro
+dominio, actualice `PUBLIC_BASE_URL` antes de las pruebas funcionales.
+
+Para un repositorio nuevo use **New → Blueprint** en Render. El Blueprint enlaza `DATABASE_URL`
+con la URL interna de PostgreSQL, ejecuta `alembic upgrade head` antes del despliegue, inicia
+FastAPI con Uvicorn y valida `/health/ready`. GitHub Actions ejecuta pruebas y migraciones en cada
+`push` a `main`; Render despliega únicamente cuando esas comprobaciones aprueban.
+
+Si reutiliza un Web Service creado manualmente, configure exactamente:
+
+```text
+Build Command: pip install --upgrade pip && pip install -r requirements.txt
+Pre-Deploy Command: alembic upgrade head
+Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Health Check Path: /health/ready
+```
+
+Los tokens, claves de cifrado y credenciales de Meta, OIDC y Cloudflare R2 nunca deben guardarse
+en GitHub; se configuran como variables protegidas en Render.
 
 ## WhatsApp y solicitudes
 
